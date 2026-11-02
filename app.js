@@ -1,11 +1,11 @@
-/* Kanak Cafe App v2 — vanilla JS, offline PWA. Made by Misbah Digital. */
+/* Cafe App v2 (Misbah Digital cafe template) — vanilla JS, offline PWA. Config: data.js */
 (function () {
   "use strict";
   const CFG0 = window.KANAK_CONFIG;
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
   const app = $("#app");
-  const K = "kanak2_";
+  const K = (CFG0.STORAGE_KEY || "kanak2") + "_";
   const store = {
     get(k, d) { try { const v = localStorage.getItem(K + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(K + k, JSON.stringify(v)); } catch (e) {} },
@@ -66,7 +66,7 @@
   const varLabel = (m, v) => (!hasHF(m) ? "" : m.c === "combo" ? (v === "h" ? "2 log" : "4 log") : (v === "h" ? "Half" : "Full"));
   function photo(m, size) {
     if (m.img) return `<img src="img/${m.img}${size === "s" ? "-s" : ""}.webp" alt="${esc(m.n)}" loading="lazy">`;
-    return `<div class="emo">${catOf(m.c).e}<small>KANAK</small></div>`;
+    return `<div class="emo">${catOf(m.c).e}<small>${esc(CFG.SHORT_NAME.split(" ")[0].toUpperCase())}</small></div>`;
   }
   const vdot = (m) => `<span class="vdot ${m.v ? "" : "nv"}" title="${m.v ? "Veg" : "Non-veg"}"></span>`;
   function toast(msg) { const el = $("#toast"); el.textContent = msg; el.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove("show"), 2200); }
@@ -171,7 +171,7 @@
       <div class="offers">${offers.map((x) => `<div class="offer" role="button" tabindex="0" data-offer="${x.id}"><span class="tag">${esc(x.tag || "OFFER")}</span><b>${esc(x.title)}</b><span>${esc(x.sub)}</span><div class="ic">${x.itemId && item(x.itemId) ? catOf(item(x.itemId).c).e : "🎁"}</div></div>`).join("") || `<p class="muted">Aaj koi offer nahi.</p>`}</div>
       <h2 class="sec">${t("best")} ⭐ <a href="#/menu">${t("all")} →</a></h2>
       <div class="grid">${best.map((m) => `<article class="pcard" data-open="${m.id}"><div class="ph">${photo(m, "s")}<span class="ribbon">BESTSELLER</span></div><div class="bd"><div class="nm">${vdot(m)} ${esc(m.n)}</div><div class="row"><span class="price">${rs(minPrice(m))}${hasHF(m) ? "+" : ""}</span>${addBtn(m)}</div></div></article>`).join("")}</div>
-      <div class="card" style="margin-top:20px"><h4>Kanak ke baare mein ✨</h4>
+      <div class="card" style="margin-top:20px"><h4>${esc(CFG.SHORT_NAME)} ke baare mein ✨</h4>
         <div class="muted small">Log yahan aate hain in cheezon ke liye:</div>
         <div class="tagrow">${CFG.KNOWN_FOR.map((k) => `<span>😋 ${esc(k)}</span>`).join("")}</div>
         <div class="tagrow">${CFG.SERVICES.map((k) => `<span>✔ ${esc(k)}</span>`).join("")}</div>
@@ -232,7 +232,7 @@
           ${m.best ? `<span class="best">★ BESTSELLER</span>` : ""}
           <h3>${vdot(m)} ${esc(m.n)}</h3>
           <div class="muted small">${m.d ? esc(m.d) : esc(catOf(m.c).n)}</div>
-          ${m.img ? `<div class="small" style="margin-top:6px;color:var(--gold)">📸 Asli photo — Kanak Cafe</div>` : ""}
+          ${m.img ? `<div class="small" style="margin-top:6px;color:var(--gold)">📸 Asli photo — ${esc(CFG.SHORT_NAME)}</div>` : ""}
           ${hasHF(m) ? ["h", "f"].map((k) => `<div class="opt ${v === k ? "on" : ""}" data-v="${k}"><span>${varLabel(m, k)}</span><b>${rs(priceOf(m, k))}</b></div>`).join("") : `<div class="price" style="font-size:22px;margin-top:10px">${rs(m.p)}</div>`}
           ${m.out ? `<p class="muted">Abhi khatam hai 😔</p>` : `<div class="foot">
             <span class="stepper"><button data-q="-1" aria-label="Kam">−</button><span>${q}</span><button data-q="1" aria-label="Zyada">+</button></span>
@@ -271,8 +271,8 @@
         <label class="field"><span>${t("note")}</span><input id="f_note" value="${esc(checkout.note)}"></label>
       </div>
       <div class="card"><h4>🎟️ ${t("coupon")}</h4>
-        <div class="coupon"><div class="field" style="flex:1;margin:0"><input id="f_coupon" value="${esc(checkout.coupon)}" placeholder="KANAK10" aria-label="${t("coupon")}"></div><button class="btn ghost sm" id="applyCp">${t("apply")}</button></div>
-        <div class="small" style="margin-top:8px" id="cpMsg">${s.cmsg || "Try karo: <b>KANAK10</b> (demo)"}</div></div>
+        <div class="coupon"><div class="field" style="flex:1;margin:0"><input id="f_coupon" value="${esc(checkout.coupon)}" placeholder="${esc((window.KANAK_COUPONS[0] || {}).code || "COUPON")}" aria-label="${t("coupon")}"></div><button class="btn ghost sm" id="applyCp">${t("apply")}</button></div>
+        <div class="small" style="margin-top:8px" id="cpMsg">${s.cmsg || `Try karo: <b>${esc((window.KANAK_COUPONS[0] || {}).code || "")}</b> (demo)`}</div></div>
       <div class="card bill"><h4>🧾 ${t("bill")}</h4>
         <div class="r"><span>${t("items_total")}</span><span>${rs(s.sub)}</span></div>
         ${d ? `<div class="r"><span>${t("dfee")}</span><span>${s.fee ? rs(s.fee) : "FREE"}</span></div>` : ""}
@@ -305,7 +305,7 @@
     if (s.disc) msg += `\nCoupon ${order.coupon}: −₹${s.disc}`;
     msg += `\n*Total: ₹${s.total}*\n\n👤 ${order.name}\n📞 ${ph}\n${d ? "🛵 Delivery: " + order.addr : "🏃 Pickup (cafe se)"}`;
     if (order.note) msg += `\n📝 ${order.note}`;
-    msg += `\n\n(Kanak Cafe app se bheja)`;
+    msg += `\n\n(${CFG.SHORT_NAME} app se bheja)`;
     orders.unshift(order); store.set("orders", orders);
     cart = []; saveCart(); checkout.coupon = ""; checkout.note = ""; store.set("checkout", checkout);
     window.open(waLink(CFG.WHATSAPP_NUMBER, msg), "_blank");
@@ -347,7 +347,7 @@
 
   function Gallery() {
     app.innerHTML = `<div class="page"><div class="gallery">${window.KANAK_GALLERY.map((g) => `<button data-lb="img/${g}.webp" aria-label="Photo badi karo"><img src="img/${g}${g === "menu-cover" ? "" : "-s"}.webp" alt="Kanak Cafe photo" loading="lazy"></button>`).join("")}</div>
-    <p class="note">Photos: Kanak Cafe ki Google listing se</p></div>`;
+    <p class="note">Photos: ${esc(CFG.SHORT_NAME)} ki Google listing se</p></div>`;
   }
   function About() {
     app.innerHTML = `<div class="page">
@@ -447,7 +447,7 @@
       prefs.notif = e.target.checked; savePrefs();
       if (prefs.notif && "Notification" in window && Notification.permission === "default") { try { await Notification.requestPermission(); } catch (_) {} }
       toast(prefs.notif ? "Notifications ON 🔔 (demo)" : "Notifications OFF");
-      if (prefs.notif) setTimeout(() => notify("Kanak Cafe 🔥", "Aaj Noodles + Chicken Chilly combo sirf ₹149!"), 900);
+      if (prefs.notif) setTimeout(() => notify(CFG.SHORT_NAME + " 🔥", ((OFFERS.find((o) => o.on) || {}).title || "Aaj ka special") + " — abhi order karo!"), 900);
     };
   }
 
@@ -512,7 +512,7 @@
         <div class="its">${o.lines.map((l) => `${l.q}× ${esc(l.n)}`).join(", ")}</div>
         <div class="hd"><b class="price">${rs(o.total)}</b>
           <select data-ost="${i}" aria-label="Status">${STEPS.map((s) => `<option value="${s}" ${o.status === s ? "selected" : ""}>${t(s)}</option>`).join("")}</select></div>
-        <div class="acts"><a class="btn ghost sm" href="tel:${o.phone}">📞 Call</a><a class="btn ghost sm" href="${waLink("91" + o.phone, `Namaste ${o.name}, Kanak Cafe se — aapka order #${o.no} `)}" target="_blank" rel="noopener">💬 WhatsApp</a>
+        <div class="acts"><a class="btn ghost sm" href="tel:${o.phone}">📞 Call</a><a class="btn ghost sm" href="${waLink("91" + o.phone, `Namaste ${o.name}, ${CFG.SHORT_NAME} se — aapka order #${o.no} `)}" target="_blank" rel="noopener">💬 WhatsApp</a>
           ${o.status !== "done" ? `<button class="btn gold sm" data-onext="${i}">Next → ${t(STEPS[Math.min(3, STEPS.indexOf(o.status) + 1)])}</button>` : ""}</div></div>`).join("") || `<div class="empty"><div class="e">✅</div>Koi order nahi</div>`}`;
   }
   let menuEditQ = "";
@@ -570,7 +570,7 @@
     if ((el = T_.closest("[data-dec]"))) { changeItem(el.dataset.dec, -1); rerenderKeepScroll(); return; }
     if (T_.closest("[data-stop]")) return;
     if ((el = T_.closest("[data-open]"))) { openItem(el.dataset.open); return; }
-    if ((el = T_.closest("[data-offer]"))) { const o = OFFERS.find((x) => x.id === el.dataset.offer); if (o && o.itemId && item(o.itemId)) openItem(o.itemId); else if (o && o.cat) location.hash = "#/menu/" + o.cat; else { location.hash = "#/menu"; toast("Checkout pe coupon KANAK10 lagao 🎟️"); } return; }
+    if ((el = T_.closest("[data-offer]"))) { const o = OFFERS.find((x) => x.id === el.dataset.offer); if (o && o.itemId && item(o.itemId)) openItem(o.itemId); else if (o && o.cat) location.hash = "#/menu/" + o.cat; else { location.hash = "#/menu"; toast("Checkout pe coupon " + ((window.KANAK_COUPONS[0] || {}).code || "") + " lagao 🎟️"); } return; }
     if ((el = T_.closest("[data-veg]"))) { prefs.veg = el.dataset.veg; savePrefs(); Menu(); if (cartCount()) { const o = $(".cartbar"); if (!o) showCartBar(); } return; }
     if ((el = T_.closest("[data-jump]"))) { const s = $("#cat-" + el.dataset.jump); if (s) s.scrollIntoView({ behavior: "smooth" }); $$("#catChips .chip").forEach((c) => c.classList.toggle("on", c === el)); return; }
     if ((el = T_.closest("[data-ck]"))) { changeKey(el.dataset.ck, Number(el.dataset.d)); rerenderKeepScroll(); return; }

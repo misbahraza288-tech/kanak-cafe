@@ -28,7 +28,8 @@ window.KANAK_CONFIG = {
   OWNER_PIN: "1234",
   MADE_BY: "Misbah Digital",
   MADE_BY_WHATSAPP: "917488484114",
-  APP_VERSION: "2.0.0"
+  APP_VERSION: "2.0.0",
+  STORAGE_KEY: "kanak2"                    // har client ka alag rakho
 };
 
 // Coupon codes (sample) — owner panel se bhi badal sakte ho
